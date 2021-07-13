@@ -22,7 +22,7 @@ for i=3:102
         xlabel('Smoothing window, ms');
         ylabel('Percent correct');
         xlim([min(window_length),max(window_length)]);
-        title('Natural AN: %s\n', fileList(i).name);
+        title('Natural AN: ');
     
     spkInstance = fileList(i).name;
     spkInstance = spk_read(spkInstance);
