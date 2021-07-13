@@ -22,10 +22,13 @@ for i=3:102
         xlabel('Smoothing window, ms');
         ylabel('Percent correct');
         xlim([min(window_length),max(window_length)]);
-        title('Natural AN: %s\n', fileList(i).name);
-    
-    spkInstance = fileList(i).name;
-    spkInstance = spk_read(spkInstance);
+        title(fileList(i).name);
+    end
+    % Ascertains the frequency.
+    spkFreq = fileList(i).name;
+    spkInstance = spk_read(spkFreq);
+    % Labels each .spk instance with its respective freq.
+    spkInstance(i).original_filename = spkFreq;
     % load the spk instance into the buildneurogram function
     neurograms=buildneurograms(spkInstance,binsize,duration);
     % Now we run the classifier for it:
