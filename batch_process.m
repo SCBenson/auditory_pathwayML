@@ -34,15 +34,7 @@ maxTick = 1;
 %spkList = fileList(3).name; For example
 
 for i=1:100
-    if i<=10
-        figure();
-        xlabel('Smoothing window, ms');
-        ylabel('Percent correct');
-        xlim([min(window_length),max(window_length)]);
-        s1 = sprintf('Frequency: %i',freqList(i));
-        s2 = 'Hz';
-        title(strcat(s1,s2));
-    end
+
     % Ascertains the frequency.
     spkFreq = fileList(i).name;
     spkInstance = spk_read(spkFreq);
@@ -66,8 +58,21 @@ for i=1:100
     maxPrediction = max(meanvals);
     maxPredictions(maxTick) = maxPrediction;
     maxTick = maxTick + 1;
-            
-    semilogx(window_length,meanvals,'kx-')
+       
+    
+    if i<=10
+        figure();
+        semilogx(window_length,meanvals,'kx-')
+        s1 = sprintf('Frequency: %i',freqList(i));
+        s2 = 'Hz';
+        title(strcat(s1,s2));
+        xlabel('Smoothing window, ms');
+        ylabel('Percent correct (%)');
+        xlim([min(window_length),max(window_length)]);
+
+        
+    end    
+    
     
     
 end
