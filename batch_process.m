@@ -2,8 +2,11 @@
 savepath=path;
 addpath(genpath(pwd));
 
+%Choose your region of the brain to batch process:
+region = 'N/A' % AN, IC, AI
+
 % Path to AN data
-datadir=fullfile('Data','AN','natural');
+datadir=fullfile('Data',region,'natural');
 
 fileList = dir(datadir); % lists all of the .spk files
 
@@ -34,7 +37,7 @@ maxTick = 1;
 %spkList = fileList(3).name; For example
 
 for i=1:100
-
+    
     % Ascertains the frequency.
     spkFreq = fileList(i).name;
     spkInstance = spk_read(spkFreq);
@@ -104,3 +107,4 @@ xlabel('Frequency (Hz)');
 ylabel('Maximum Successful Prediction (%)');
 
 path=savepath;
+region = 'NA';

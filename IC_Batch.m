@@ -1,11 +1,19 @@
+%% Generating the Path
 % Add the neccessary scripts to the path
 savepath=path;
 addpath(genpath(pwd));
-
-region = 'AN';
-mode = 'natural';
-unitType = 'SU';
-
+%% Neurogram Parameters
+%Now we must declare parameters for future neurogram.
+binsize=1e-3;
+duration=0.7;
+load('Default.mat','parameters');
+window_length=round(logspace(0,log10(400),10));
+N=numel(window_length);
+%% Region & Node Specific Parameters
+region = 'IC'; % AN: Auditory Nerve (simulated) || IC: Inferior Colliculus (Real-data) || AI: Primary Auditory Cortex (Real-data)
+mode = '1ch50'; % [natural(AN),RF(IC,AI)] OR xchyyy , where x=[0(IC,AI),1,2,4,8] yyy=[16,50(IC&AI),160(IC&AI),500]
+unitType = 'SU'; % SU-Single Unit || MU-Multi Unit
+%% Extracting Region/Node Specific Data
 if region == 'AN'
     % Path to IC/AI data
     datadir=fullfile('Data',region,mode);
@@ -19,27 +27,22 @@ fileList = dir(datadir); % lists all of the .mat files
 
 % formatting to get rid of unnecessary cells:
 fileList = fileList(3:102);
-
+%% For Plotting Later...
 freqList = zeros(100,1);
 
-%Now we must declare parameters for future neurogram.
-binsize=1e-3;
-duration=0.7;
-load('Default.mat','parameters');
-window_length=round(logspace(0,log10(400),10));
-N=numel(window_length);
-
-% Now to split the names of each of the cells in fileList to obtain the
-% frequency:
-
-% for ij=1:100
-%     inter_mediary = split(fileList(ij).name,'H');
-%     inter_mediary = cell2mat(inter_mediary(1));
-%     freqList(ij) = str2num(inter_mediary);
-% end
-    
 maxPredictions = zeros(100,1);
 maxTick = 1;
+% Now to split the names of each of the cells in fileList to obtain the
+% frequency:
+if region == 'AN'
+    for ij=1:100
+        inter_mediary = split(fileList(ij).name,'H');
+        inter_mediary = cell2mat(inter_mediary(1));
+        freqList(ij) = str2num(inter_mediary);
+    end
+end
+%% Batch Processing
+
 % We must access each .spk file via a for loop.
 %spkList = fileList(3).name; For example
 
@@ -55,7 +58,18 @@ for i=1:100
             neurograms=buildneurograms(spkInstance(1),binsize,duration);
             % Now we run the classifier for it:
             printf('Batch number: %i\n', i);
-        case 'IC' | 'AI'
+        case 'IC'
+            
+            dataInstance = load(fullfile(datadir,fileList(i).name));
+            
+            dataInstance = dataInstance.spkdata;
+            
+            % load the spk instance into the buildneurogram function
+            neurograms=buildneurograms(dataInstance(1),binsize,duration);
+    
+            % Now we run the classifier for it:
+            fprintf('Batch number: %i\n', i);
+        case 'AI'
             
             dataInstance = load(fullfile(datadir,fileList(i).name));
             

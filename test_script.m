@@ -3,9 +3,10 @@ savepath=path;
 addpath(genpath(pwd));
 
 % Path to AN data
-datadir=fullfile('data','AN','natural');
+datadir=fullfile('Data','IC','SU','1ch16');
 % datadir=fullfile('..', 'data', 'AI','SU', '0ch');
 fileList = dir(datadir);
+fileList = fileList(3:113);
 
 lenFile = length(fileList);
 % 
@@ -16,8 +17,8 @@ lenFile = length(fileList);
  
 
 % filename(s)
-filename=fullfile(datadir,'111Hz.spk');
-%filename=fullfile(datadir,'G1_10_1505_p1_2000_vcv_0ch__unit1_SPK.mat');
+%filename=fullfile(datadir,'111Hz.spk');
+filename=fullfile(datadir,'G1_1_1411_p1_6300_vcv_1ch_unit1_SPK_envBW_16.mat');
 filename=spk_read(filename);
 
 % (Optional) Display the spike rasters
