@@ -34,10 +34,8 @@ function data = spk_read(filename)
   else
     filename = [name '.spk'];
   end
-  filename
+
   [fid, msg ]= fopen(filename, 'r');
-  fid
-  msg
   
   nChars = fread(fid, 1, 'uint8');
   data.original_filename = fread(fid, nChars, 'int8=>char')';

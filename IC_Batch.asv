@@ -112,8 +112,7 @@ for i=1:100
         xlim([min(window_length),max(window_length)]);
         figName = int2str(freqList(i));
         figFullName = strcat(mode,figName,s2,'.fig');
-        savingPosition = strcat(figDirec,'\',figFullName);
-        savefig(savingPosition);
+        savefig(figDirec,figFullName);
 
         
     end    
@@ -144,12 +143,11 @@ for u=1:100
     
     
 plot(x,y);
-header = 'Maximum Prediction Frequencies'
-p_T = strcat(pad(region),pad(mode),header);
-title(p_T);
+plotTitle = strcat(pad(region),pad(mode),header4Plot);
+title(plotTitle);
 figSaveAs = strcat(region, mode,'.fig');
-savePosition = strcat(figDirec,'\',figSaveAs);
+savePosition = strcat(figDirec,'\)
 xlabel('Frequency (Hz)');
 ylabel('Maximum Successful Prediction (%)');
-savefig(savePosition);
+savefig(figDirec, figSaveAs);
 path=savepath;
