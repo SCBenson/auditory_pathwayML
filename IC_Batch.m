@@ -11,7 +11,7 @@ window_length=round(logspace(0,log10(400),10));
 N=numel(window_length);
 %% Region & Node Specific Parameters
 region = 'AN'; % AN: Auditory Nerve (simulated) || IC: Inferior Colliculus (Real-data) || AI: Primary Auditory Cortex (Real-data)
-mode = '8ch500'; % [natural(AN),RF(IC,AI)] OR xchyyy , where x=[0(IC,AI),1,2,4,8] yyy=[16,50(IC&AI),160(IC&AI),500]
+mode = '4ch500'; % [natural(AN),RF(IC,AI)] OR xchyyy , where x=[0(IC,AI),1,2,4,8] yyy=[16,50(IC&AI),160(IC&AI),500]
 unitType = 'SU'; % SU-Single Unit || MU-Multi Unit
 %% Extracting Region/Node Specific Data
 if region == 'AN'
@@ -144,8 +144,8 @@ for u=1:100
     
     
 plot(x,y);
-header = 'Maximum Prediction Frequencies'
-p_T = strcat(pad(region),pad(mode),header);
+header = ' '+'Maximum Prediction Frequencies';
+p_T = strcat(region,mode,header);
 title(p_T);
 figSaveAs = strcat(region, mode,'.fig');
 savePosition = strcat(figDirec,'\',figSaveAs);
