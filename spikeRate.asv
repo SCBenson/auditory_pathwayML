@@ -1,0 +1,20 @@
+% Takes in a 10x1 cell array of spike times for each repitition
+function sR = spikeRate(cellOfSpikes, stoppage)
+    % create a new variable to store the spike times
+    spikeCells = cellOfSpikes;
+    limit = stoppage;
+    %will contain the no. of spikes recorded for each repetition
+    sR = zeros(limit,10);
+    noOfSpikes = zeros(10
+    %spkRates = zeros(stoppage,1);
+    for i = 1:length(dataInstance.sets)
+        spikeSweep = spikeCells{i};
+        for j = 1:10
+            emptyArray = zeros(1,10);
+            emptyArray(j) = length(spikeSweep(j));
+        end
+        sR(i,:) = emptyArray(:);
+    end
+        
+    
+end

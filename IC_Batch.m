@@ -10,9 +10,9 @@ load('Default.mat','parameters');
 window_length=round(logspace(0,log10(400),10));
 N=numel(window_length);
 %% Region & Node Specific Parameters
-region = 'AN'; % AN: Auditory Nerve (simulated) || IC: Inferior Colliculus (Real-data) || AI: Primary Auditory Cortex (Real-data)
-mode = '4ch500'; % [natural(AN),RF(IC,AI)] OR xchyyy , where x=[0(IC,AI),1,2,4,8] yyy=[16,50(IC&AI),160(IC&AI),500]
-unitType = 'SU'; % SU-Single Unit || MU-Multi Unit
+region = 'IC'; % AN: Auditory Nerve (simulated) || IC: Inferior Colliculus (Real-data) || AI: Primary Auditory Cortex (Real-data)
+mode = '1ch16'; % [natural(AN),RF(IC,AI)] OR xchyyy , where x=[0(IC,AI),1,2,4,8] yyy=[16,50(IC&AI),160(IC&AI),500]
+unitType = 'MU'; % SU-Single Unit || MU-Multi Unit
 %% Extracting Region/Node Specific Data
 if region == 'AN'
     % Path to IC/AI data
@@ -26,7 +26,7 @@ end
 fileList = dir(datadir); % lists all of the .mat files
 
 % formatting to get rid of unnecessary cells:
-fileList = fileList(3:102);
+fileList = fileList(3:102); %3:size(fileList)??
 %% For Plotting Later...
 freqList = zeros(100,1);
 getFigDirec=dir('figures');
@@ -121,6 +121,17 @@ for i=1:100
     
     
 end
+
+if region == 'IC'
+    stoppage = length(dataInstance.sets);
+    spkSetInfo = dataInstance.sets.sweeps;
+            
+    % Compute the SpikeRate and intermittent Spike Times:
+           
+    sR = spikeRate(spkSetInfo, stoppage);
+
+end
+
 figure()
 
 %create new array for x and y with size of the freq range.
