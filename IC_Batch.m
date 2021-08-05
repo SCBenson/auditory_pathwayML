@@ -7,12 +7,11 @@ addpath(genpath(pwd));
 binsize=1e-3;
 duration=0.7;
 load('Default.mat','parameters');
-window_length=round(logspace(0,log10(400),10));
-N=numel(window_length);
+
 %% Region & Node Specific Parameters
-region = 'IC'; % AN: Auditory Nerve (simulated) || IC: Inferior Colliculus (Real-data) || AI: Primary Auditory Cortex (Real-data)
+region = 'AN'; % AN: Auditory Nerve (simulated) || IC: Inferior Colliculus (Real-data) || AI: Primary Auditory Cortex (Real-data)
 mode = '1ch16'; % [natural(AN),RF(IC,AI)] OR xchyyy , where x=[0(IC,AI),1,2,4,8] yyy=[16,50(IC&AI),160(IC&AI),500]
-unitType = 'MU'; % SU-Single Unit || MU-Multi Unit
+unitType = 'SU'; % SU-Single Unit || MU-Multi Unit
 %% Extracting Region/Node Specific Data
 if region == 'AN'
     % Path to IC/AI data
@@ -51,6 +50,8 @@ end
 for i=1:100
     switch region
         case 'AN'
+            window_length=round(logspace(0,log10(400),10));
+            N=numel(window_length);
             % Ascertains the frequency.
             spkFreq = fileList(i).name;
             spkInstance = spk_read(spkFreq);
@@ -66,16 +67,27 @@ for i=1:100
             
             dataInstance = dataInstance.spkdata;
             
+            rep_size = size(dataInstance.sets(1).sweeps);
+            reps = rep_size(1);
+            window_length=round(logspace(0,log10(400),reps)); % rep size is the no. of repetitions
+            N=numel(window_length);  
+            
             % load the spk instance into the buildneurogram function
             neurograms=buildneurograms(dataInstance(1),binsize,duration);
     
             % Now we run the classifier for it:
             fprintf('Batch number: %i\n', i);
         case 'AI'
+          
             
             dataInstance = load(fullfile(datadir,fileList(i).name));
             
             dataInstance = dataInstance.spkdata;
+            
+            rep_size = size(dataInstance.sets(1).sweeps);
+            reps = rep_size(1);
+            window_length=round(logspace(0,log10(400),reps)); % rep size is the no. of repetitions
+            N=numel(window_length);              
             
             % load the spk instance into the buildneurogram function
             neurograms=buildneurograms(dataInstance(1),binsize,duration);
@@ -86,7 +98,6 @@ for i=1:100
 
 
     for io=1:N
-        
         fprintf(['Smoothing=',num2str(window_length(io)),'ms (',...
             num2str(io),' of ',num2str(N),')\n']);
         parameters.window_length=window_length(io);
