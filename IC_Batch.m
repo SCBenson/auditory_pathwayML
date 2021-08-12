@@ -31,8 +31,7 @@ freqList = zeros(100,1);
 getFigDirec=dir('figures');
 figDirec = getFigDirec(1).folder;
 
-maxPredictions = zeros(100,1);
-maxTick = 1;
+
 % Now to split the names of each of the cells in fileList to obtain the
 % frequency:
 if region == 'AN'
@@ -132,16 +131,16 @@ for i=1:100
     
     
 end
+% 
+% if region == 'IC'
+%     stoppage = length(dataInstance.sets);
+%     spkSetInfo = dataInstance.sets.sweeps;
+%             
+%     %Compute the SpikeRate and intermittent Spike Times:
+%            
+%     sR = spikeRate(spkSetInfo, stoppage);
 
-if region == 'IC'
-    stoppage = length(dataInstance.sets);
-    spkSetInfo = dataInstance.sets.sweeps;
-            
-    % Compute the SpikeRate and intermittent Spike Times:
-           
-    sR = spikeRate(spkSetInfo, stoppage);
 
-end
 
 figure()
 
@@ -175,3 +174,21 @@ xlabel('Frequency (Hz)');
 ylabel('Maximum Successful Prediction (%)');
 savefig(savePosition);
 path=savepath;
+
+for i = 1:100
+
+    window_length=round(logspace(0,log10(400),10));
+    N=numel(window_length);
+    % Ascertains the frequency.
+    spkFreq = fileList(i).name;
+    spkInstance = spk_read(spkFreq);
+    % Labels each .spk instance with its respective freq.
+    spkInstance(1).original_filename = spkFreq;
+    % load the spk instance into the buildneurogram function
+    neurograms=buildneurograms(spkInstance(1),binsize,duration);
+    % Now we run the classifier for it:
+    fprintf('Batch number: %i\n', i);
+
+
+
+end
