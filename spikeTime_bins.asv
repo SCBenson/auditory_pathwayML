@@ -1,9 +1,9 @@
 load('Default.mat','parameters');
-datadir=fullfile('Data','IC','SU','1ch16');
+datadir=fullfile('Data','IC','SU','1ch50');
 fileList = dir(datadir);
 fileNames = fileList(3:length(fileList));
 
-dataInstance = load(fullfile(datadir,fileNames(1).name));
+dataInstance = load(fullfile(datadir,fileNames(25).name));
 dataInstance = dataInstance.spkdata.sets;
 
 % Create the time bins for spike times (1x10) e.g [0, 1, 1, 3, 2, 1, 0, 0, 0, 2]
@@ -58,8 +58,15 @@ end
 
 % now we need to get the phoneme correlated avgBins
 phonemeSpkBin = zeros(16,10);
-for i = 1:48
-    
-    spikeBin(i,:)
+for i = 1:16  
+    phonemeSpkBin(i,:) = spikeBin(i,:)+spikeBin(i+16,:)+spikeBin(i+32);
+end
+
+phon
+
+imagesc(phonemeSpkBin);
+title('Phoneme Spike Times for One File');
+colorbar
+        
 
 
