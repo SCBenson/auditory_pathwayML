@@ -1,12 +1,18 @@
+% function binThis = spikeTime_bins()
+% Add the neccessary scripts to the path
+savepath=path;
+addpath(genpath(pwd));
 load('Default.mat','parameters');
 datadir=fullfile('Data','IC','SU','1ch16');
-folderdir = fullfile('Data','IC','SU');
+type = '0ch';
+folders = fullfile('Data','IC','SU');
+folderdir = fullfile('Data','IC','SU',type);
 
-fileList = dir(datadir);
-folderList = dir(folderdir);
+fileList = dir(folderdir);
+folderList = dir(folders);
 
 
-fileNames = fileList(3:length(fileList));
+spkFileNames = fileList(3:length(fileList));
 folderNames = folderList(3:length(folderList));
 
 
@@ -14,12 +20,20 @@ folderNames = folderList(3:length(folderList));
 % Create the time bins for spike times (1x10) e.g [0, 1, 1, 3, 2, 1, 0, 0, 0, 2]
 % each index corresponds to 70ms of time elapsed.
 
-sec = zeros(16,10,length(fileNames));
+sec = zeros(16,10,length(spkFileNames));
+completeList = zeros(16,10,length(folderNames));
 for f = 1:length(folderNames)
-    folderInstance = load(fullfile(folderdir,folderNames(f).names));
-
-    for s = 1:length(fileNames)
-        dataInstance = load(fullfile(datadir,fileNames(s).name));
+%   folderInstance = load(fullfile(folderdir,folderNames(f).name));
+    type = folderNames(f).name;
+    folderdir = fullfile('Data','IC','SU',type);
+    fileList = dir(folderdir);
+    spkFileNames = fileList(3:length(fileList));
+    
+%   We create a directory to a folder with data, but we need to append the
+%   folder name to datadir to load it
+    for s = 1:length(spkFileNames)
+        folderdir = fullfile('Data','IC','SU',type);
+        dataInstance = load(fullfile(folderdir,spkFileNames(s).name));
         dataInstance = dataInstance.spkdata.sets;
         spikeBin = zeros(48,10);
         for i = 1:48
@@ -41,6 +55,8 @@ for f = 1:length(folderNames)
 
                 else
                     repRow = cell2mat(repRow);
+                    setBin = 10;
+                    linspace(0,0.7,setBin);
                     for k = 1:length(repRow)
                         spkTime = repRow(k);
                         % Logical Operators to bin the spike times.
@@ -82,25 +98,46 @@ for f = 1:length(folderNames)
         end
         sec(:,:,s) = phonemeSpkBin;
     end
-    completeList = zeros(length(folderNames),16,10);
-    for i = 1:length(fileNames)
-        completeList(:,:,f) = completeList + sec(:,:,i);
+    
+
+    % turn the 3D Matrix into a 2D Array by summing across the 3rd dim.
+    folderBinTotal = zeros(16,10);
+    for t = 1:length(sec)
+        file2D = sec(:,:,t);
+        folderBinTotal = folderBinTotal(:,:) + file2D;
     end
+    
+    completeList(:,:,f) = folderBinTotal;
 end
+% return completeList;
 % completeList = zeros(length(folderNames),16,10);
 % for i = 1:length(fileNames)
 % 
 %     completeList = completeList + sec(:,:,i);
 % 
 % end
-for i=1:length(fileNames)
+% for i=1:length(fileNames)
+%     figure();
+%     
+% end
+for image = 1:18
     figure();
-    
+    imagesc(completeList(:,:,image))
+    colormap('jet')
+    colorbar
+%     folderTitle = sprintf('Channel and Filter: %i',folderName(image).name);
+    header = sprintf("Vowel-Consonant-Vowel Spike Occurences for: %s", folderNames(image).name);
+    title(header);
+    xlabel("Time-bins in Milliseconds (ms)");
+    ylabel("Vowel-Consonant-Vowel (VCV)");
+    xticklabels(["70", "140", "210", "280", "350", "420", "490", "560", "630", "700"])
+    yticklabels(["ABA", "ADA", "AFA", "AGA", "AKA", "ALA", "AMA", "ANA", "APA", "ASA", "ASHA", "ATA", "ATHA", "AVA", "AYA", "AZA"])
+    xticks(1:10)
+    yticks(1:16)
+    break
+
 end
-imagesc(completeList)
-colorbar
-title("Vowel-Consonant-Vowel Spike Occurences for 1ch16");
-xlabel("Time-bins in Milliseconds (ms) -> 1 bin = 70ms");
-ylabel("Vowel-Consonant-Vowel (VCV) -> 1 = 'ABA'");
+% end
+
 
         

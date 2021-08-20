@@ -9,7 +9,7 @@ duration=0.7;
 load('Default.mat','parameters');
 
 %% Region & Node Specific Parameters
-region = 'AN'; % AN: Auditory Nerve (simulated) || IC: Inferior Colliculus (Real-data) || AI: Primary Auditory Cortex (Real-data)
+region = 'IC'; % AN: Auditory Nerve (simulated) || IC: Inferior Colliculus (Real-data) || AI: Primary Auditory Cortex (Real-data)
 mode = '1ch16'; % [natural(AN),RF(IC,AI)] OR xchyyy , where x=[0(IC,AI),1,2,4,8] yyy=[16,50(IC&AI),160(IC&AI),500]
 unitType = 'SU'; % SU-Single Unit || MU-Multi Unit
 %% Extracting Region/Node Specific Data
@@ -41,6 +41,12 @@ if region == 'AN'
         freqList(ij) = str2num(inter_mediary);
     end
 end
+            
+%Get the spike time bins:
+binThis = spikeTime_bins()
+            
+%Display the spike time bins:
+imageThis(binThis);
 %% Batch Processing
 
 % We must access each .spk file via a for loop.
@@ -73,6 +79,7 @@ for i=1:100
             
             % load the spk instance into the buildneurogram function
             neurograms=buildneurograms(dataInstance(1),binsize,duration);
+
     
             % Now we run the classifier for it:
             fprintf('Batch number: %i\n', i);
