@@ -8,7 +8,7 @@ for trial = 1:1
     
     % This sets the no. of rows needed for making the binned array
     % as every phoneme repetition time trial has diff no. of cells.
-    checkInstance = trialInstance(sweep_check).sweeps;
+    checkInstance = trialInstance(trial).sweeps;
     sweep_height = length(checkInstance);
     height = sweep_height*48;
 
@@ -33,7 +33,7 @@ for trial = 1:1
                 repetitionList = zeros(1,1);
             end
 
-            % This is looping throw 1 spike train and binning.
+            % This is looping through 1 spike train and binning.
             for spkTimeIndex = 1:length(repetitionList)
                 spkTime = repetitionList(spkTimeIndex);
                 if spkTime == 0
@@ -42,8 +42,7 @@ for trial = 1:1
                     bin_array((sweeps*sweep_height)-sweep_height:sweeps*sweep_height) = zeros(sweep_height,bins);
                 end
                 if spkTime <= bins && spkTime > 0
-                    bin_array((sweeps*sweep_height)-sweep_height,1) = bin_array((sweeps*sweep_height)-sweep_height,1); 
-%                    bin_array(sweep_height*sweeps,1) = bin_array(sweep_height,1) +1;      
+                    bin_array((sweeps*sweep_height)-sweep_height + (rep-1),1) = bin_array((sweeps*sweep_height)-sweep_height + (rep-1),1) + 1;      
                 end
                 for i = 1:bins
                     if spkTime > set_bin * i && spkTime <= set_bin * i + set_bin && i ~= bins
