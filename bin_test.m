@@ -13,10 +13,9 @@ for trial = 1:1
     height = sweep_height*48;
 
     % This will be the no. of rows for the trial matrix
-    for sweep = 1:48
+    for sweeps = 1:48
         % accessing the ith sweep containing the repetitions of spkTimes
-        sweepInstance = trialInstance(sweep).sweeps;
-
+        sweepInstance = trialInstance(sweeps).sweeps;
         %% setting the parameters for the bins
         set_bin = 0.07;
         bins = 10;
@@ -25,20 +24,26 @@ for trial = 1:1
         %% accessing each repetition for the phoneme
         for rep = 1:repIndex 
             % accessing the nth spike time array
-            repInstance = sweepInstance(repIndex);
+            repetitionList = sweepInstance(rep);
             % since its a cell, we change it to an array for indexing
-            repInstance = cell2mat(repInstance);
-            if isempty(repInstance) == 1
-                repInstance = zeros(1,1);
+            repetitionList = cell2mat(repetitionList);
+            % checking if the repetition list for this GX_ file COMPLETELY empty
+            % if it IS, then make it a 1x1 zeros array
+            if isempty(repetitionList) == 1
+                repetitionList = zeros(1,1);
             end
 
             % This is looping throw 1 spike train and binning.
-            for spkTimeIndex = 1:length(repInstance)
-                spkTime = repInstance(spkTimeIndex);
-%                 if spkTime == 0
-%                     bin_array()
+            for spkTimeIndex = 1:length(repetitionList)
+                spkTime = repetitionList(spkTimeIndex);
+                if spkTime == 0
+                    % This triggers for ONLY the 1x1 zeros array made in
+                    % line 33 to make a 10x10 zeros binned matrix.
+                    bin_array((sweeps*sweep_height)-sweep_height:sweeps*sweep_height) = zeros(sweep_height,bins);
+                end
                 if spkTime <= bins && spkTime > 0
-                   bin_array(sweep_height*sweep,1) = bin_array(sweep_height,1) +1;      
+                    bin_array((sweeps*sweep_height)-sweep_height,1) = bin_array((sweeps*sweep_height)-sweep_height,1); 
+%                    bin_array(sweep_height*sweeps,1) = bin_array(sweep_height,1) +1;      
                 end
                 for i = 1:bins
                     if spkTime > set_bin * i && spkTime <= set_bin * i + set_bin && i ~= bins
