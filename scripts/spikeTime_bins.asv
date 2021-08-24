@@ -36,7 +36,6 @@ for f = 1:length(folderNames)
         dataInstance = load(fullfile(folderdir,spkFileNames(s).name));
         dataInstance = dataInstance.spkdata.sets;
         spikeBin = zeros(48,10);
-        svmInput = zeros(480,10);
         for i = 1:48
             sweepRow = dataInstance(i).sweeps;
             chkLen = size(sweepRow());
@@ -81,24 +80,79 @@ for f = 1:length(folderNames)
                         else
                             avgBin(j,10) = avgBin(j,1) + 1;
                         end
+                        % divide the spktime by binsize (0.56/0.07) = 8
+                        % then add 1 (make sure it's an integer???
                     end
-                    % we have 1 10x10 matrix for one phoneme in 1 trial
-                    % now we need to get the phoneme correlated avgBins
-
-%                     for i = 1:16  
-%                         phonemeSpkBin(i,:) = spikeBin(i,:)+spikeBin(i+16,:)+spikeBin(i+32);
-%                     end
                
                 end
 
             end
-
+                %sum the columns to squash a 10x10 array to a 1x10 array, and
+                %place into the spikeBin 48x10 array.
+                squashedBin = sum(avgBin);
+                spikeBin(i,:) = squashedBin;
         end
-
+        % now we need to get the phoneme correlated avgBins
+        phonemeSpkBin = zeros(16,10);
+        for i = 1:16  
+            phonemeSpkBin(i,:) = spikeBin(i,:)+spikeBin(i+16,:)+spikeBin(i+32);
+        end
+        sec(:,:,s) = phonemeSpkBin;
     end
-  
-end
+    
 
+    % turn the 3D Matrix into a 2D Array by summing across the 3rd dim.
+    folderBinTotal = zeros(16,10);
+    for t = 1:length(sec)
+        file2D = sec(:,:,t);
+        folderBinTotal = folderBinTotal(:,:) + file2D;
+    end
+    
+    completeList(:,:,f) = folderBinTotal;
+end
+ben = imagesc(completeList(:,:,1))
+colorbar
+colormap('jet')
+print -deps epsFig
+% return completeList;
+% completeList = zeros(length(folderNames),16,10);
+% for i = 1:length(fileNames)
+% 
+%     completeList = completeList + sec(:,:,i);
+% 
+% end
+% for i=1:length(fileNames)
+%     figure();
+%     
+% end
+
+for imag = 1:18
+%     h(imag) = imagesc(completeList(:,:,imag),h(imag));
+%     image(imagesc(completeList(:,:,imag)),h(imag));
+    
+    
+%     figure()
+%     imagesc(completeList(:,:,imag))
+%     colormap('jet')
+%     colorbar
+% %     folderTitle = sprintf('Channel and Filter: %i',folderName(image).name);
+%     header = sprintf("Vowel-Consonant-Vowel Spike Occurences for: %s", folderNames(imag).name);
+%     title(header);
+%     xlabel("Time-bins in Milliseconds (ms)");
+%     ylabel("Vowel-Consonant-Vowel (VCV)");
+%     xticklabels(["70", "140", "210", "280", "350", "420", "490", "560", "630", "700"])
+%     yticklabels(["ABA", "ADA", "AFA", "AGA", "AKA", "ALA", "AMA", "ANA", "APA", "ASA", "ASHA", "ATA", "ATHA", "AVA", "AYA", "AZA"])
+%     xticks(1:10)
+%     yticks(1:16)
+%     getFigDirec=dir('figures\spikeTimeBins');
+%     figDirec = getFigDirec(1).folder;
+%     figName = strcat('IC_SU_',folderNames(imag).name)
+%     figSaveAs = strcat(figName,'.fig');
+%     savePosition = strcat(figDirec,'\',figSaveAs);
+%     savefig(savePosition);
+
+
+end
 % end
 
 

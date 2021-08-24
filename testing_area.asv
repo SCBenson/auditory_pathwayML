@@ -84,10 +84,10 @@ for f = 1:length(folderNames)
                     end
                     % we have 1 10x10 matrix for one phoneme in 1 trial
                     % now we need to get the phoneme correlated avgBins
-
-%                     for i = 1:16  
-%                         phonemeSpkBin(i,:) = spikeBin(i,:)+spikeBin(i+16,:)+spikeBin(i+32);
-%                     end
+                    phonemeSpkBin = zeros(480,10);
+                    for i = 1:16  
+                        phonemeSpkBin(i,:) = spikeBin(i,:)+spikeBin(i+16,:)+spikeBin(i+32);
+                    end
                
                 end
 

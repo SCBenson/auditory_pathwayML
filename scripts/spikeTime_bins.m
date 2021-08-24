@@ -2,12 +2,12 @@
 % Add the neccessary scripts to the path
 savepath=path;
 addpath(genpath(pwd));
-load('Default.mat','parameters');
+
 datadir=fullfile('Data','IC','SU','1ch16');
 type = '0ch';
 folders = fullfile('Data','IC','SU');
 folderdir = fullfile('Data','IC','SU',type);
-
+%grayscalea
 fileList = dir(folderdir);
 folderList = dir(folders);
 
@@ -40,23 +40,22 @@ for f = 1:length(folderNames)
             sweepRow = dataInstance(i).sweeps;
             chkLen = size(sweepRow());
             chk = chkLen(1);
+            
             if chk ~= 10
                 n=chk;
             else
                 n=10;
             end
-            for j = 1:n % ith sweep row
+            for j = 1:chk % ith sweep row
 
                 repRow = sweepRow(j);
-                avgBin = zeros(n,10);
+                avgBin = zeros(chk,10);
 
                 if isempty(repRow{1,1})
                     continue
 
                 else
                     repRow = cell2mat(repRow);
-                    setBin = 10;
-                    linspace(0,0.7,setBin);
                     for k = 1:length(repRow)
                         spkTime = repRow(k);
                         % Logical Operators to bin the spike times.
@@ -82,7 +81,7 @@ for f = 1:length(folderNames)
                             avgBin(j,10) = avgBin(j,1) + 1;
                         end
                     end
-
+               
                 end
 
             end
@@ -109,6 +108,10 @@ for f = 1:length(folderNames)
     
     completeList(:,:,f) = folderBinTotal;
 end
+imagesc(completeList(:,:,1))
+colorbar
+colormap('jet')
+
 % return completeList;
 % completeList = zeros(length(folderNames),16,10);
 % for i = 1:length(fileNames)
@@ -120,21 +123,32 @@ end
 %     figure();
 %     
 % end
-for image = 1:18
-    figure();
-    imagesc(completeList(:,:,image))
-    colormap('jet')
-    colorbar
-%     folderTitle = sprintf('Channel and Filter: %i',folderName(image).name);
-    header = sprintf("Vowel-Consonant-Vowel Spike Occurences for: %s", folderNames(image).name);
-    title(header);
-    xlabel("Time-bins in Milliseconds (ms)");
-    ylabel("Vowel-Consonant-Vowel (VCV)");
-    xticklabels(["70", "140", "210", "280", "350", "420", "490", "560", "630", "700"])
-    yticklabels(["ABA", "ADA", "AFA", "AGA", "AKA", "ALA", "AMA", "ANA", "APA", "ASA", "ASHA", "ATA", "ATHA", "AVA", "AYA", "AZA"])
-    xticks(1:10)
-    yticks(1:16)
-    break
+
+for imag = 1:18
+%     h(imag) = imagesc(completeList(:,:,imag),h(imag));
+%     image(imagesc(completeList(:,:,imag)),h(imag));
+    
+    
+%     figure()
+%     imagesc(completeList(:,:,imag))
+%     colormap('jet')
+%     colorbar
+% %     folderTitle = sprintf('Channel and Filter: %i',folderName(image).name);
+%     header = sprintf("Vowel-Consonant-Vowel Spike Occurences for: %s", folderNames(imag).name);
+%     title(header);
+%     xlabel("Time-bins in Milliseconds (ms)");
+%     ylabel("Vowel-Consonant-Vowel (VCV)");
+%     xticklabels(["70", "140", "210", "280", "350", "420", "490", "560", "630", "700"])
+%     yticklabels(["ABA", "ADA", "AFA", "AGA", "AKA", "ALA", "AMA", "ANA", "APA", "ASA", "ASHA", "ATA", "ATHA", "AVA", "AYA", "AZA"])
+%     xticks(1:10)
+%     yticks(1:16)
+%     getFigDirec=dir('figures\spikeTimeBins');
+%     figDirec = getFigDirec(1).folder;
+%     figName = strcat('IC_SU_',folderNames(imag).name)
+%     figSaveAs = strcat(figName,'.fig');
+%     savePosition = strcat(figDirec,'\',figSaveAs);
+%     savefig(savePosition);
+
 
 end
 % end
