@@ -1,4 +1,4 @@
-x = linspace(1,10,10);
-y = x;
-
-z = cat(1,x,y);
+load('neuron1','bin_array')
+trial = bin_array;
+sweep_height = length(trial);
+svmPredict = svmclassify(trial, sweep_height)
