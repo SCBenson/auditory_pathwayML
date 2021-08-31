@@ -1,5 +1,5 @@
 %load('neuron55','bin_array')
-function randTrees = bagThis(bin_array, sweep_height)
+function svmPredict = svmclassify(bin_array, sweep_height)
 
 %Support Vector Machine Classification
 

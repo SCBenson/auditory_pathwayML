@@ -1,4 +1,4 @@
-%load('neuron55','bin_array')
+%load('neuron1','bin_array')
 function randTrees = bagThis(bin_array, sweep_height)
 
 %Support Vector Machine Classification
@@ -67,6 +67,6 @@ B = TreeBagger(5,training_input,training_output,'OOBPrediction','on');
 Y_hat = predict(B, testing_input);
 acc = Y_hat == testing_output; % phonemes if this doesnt work
 total_acc = sum(acc(:,1));
-percentage_correct = total_acc/480;
+randTrees = total_acc/480;
 end
 
