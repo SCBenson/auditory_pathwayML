@@ -1,5 +1,5 @@
 %load('neuron1','bin_array')
-function randTrees = bagThis(bin_array, sweep_height)
+
 
 %Support Vector Machine Classification
 
@@ -36,8 +36,6 @@ end
 % 480 random numbers to split the data.
 splitting_indx = randi([1 480],1,480);
 
-idxPhoneme = (Y=="ASHA")';
-S = X(idxPhoneme,:);
 organisedPhonemes = [];
 for i = 1:length(p)
     idx = (phonemes==p(i));
@@ -63,10 +61,10 @@ end
 %% Inserting the Training and Testing Data and Predicting Phonemes
 % Randomise the data for test and train
 %ClassTreeEns = fitensemble(organisedPhonemes,phonemes,'AdaBoostM2',3000,'Tree');
-B = TreeBagger(5,training_input,training_output,'OOBPrediction','on'); 
+B = TreeBagger(150,training_input,training_output,'OOBPrediction','on'); 
 Y_hat = predict(B, testing_input);
 acc = Y_hat == testing_output; % phonemes if this doesnt work
 total_acc = sum(acc(:,1));
 randTrees = total_acc/480;
-end
+
 

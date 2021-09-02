@@ -1,8 +1,11 @@
-folderdir = fullfile('Data','IC','SU','1ch500');
+region = 'AI';
+unit = 'MU';
+type = '1ch500';
+folderdir = fullfile('Data',region,unit,type);
 f = dir(folderdir);
 f = f(3:end);
 
-for neuron = 1:56
+for neuron = 1:length(f)
     trialInstance = load(fullfile(folderdir,f(neuron).name));
     trialInstance = trialInstance.spkdata.sets;
     
@@ -10,7 +13,7 @@ for neuron = 1:56
     % as every phoneme repetition time trial has diff no. of cells.
     checkInstance = trialInstance(1).sweeps;
     sweep_height = length(checkInstance);
-    height = sweep_height*48;
+    height = sweep_height*length(trialInstance);
     %% setting the parameters for the bins
     set_bin = 0.01;
     bins = 70;
@@ -18,7 +21,7 @@ for neuron = 1:56
     repIndex = sweep_height;
 
     % This will be the no. of rows for the trial matrix
-    for trial = 1:48
+    for trial = 1:length(trialInstance)
         % accessing the ith sweep containing the repetitions of spkTimes
         sweepInstance = trialInstance(trial).sweeps;
 
@@ -74,43 +77,24 @@ for neuron = 1:56
         end
     end
 neuronID = int2str(neuron);
-saveResultsAs = strcat('neuron',neuronID);
+where_to_save = strcat('binnedMatrices\',region,'\',unit,'\',type,'\');
+saveResultsAs = strcat(where_to_save,'neuron',neuronID);
 save(saveResultsAs,'bin_array');
 
 end
 
-imagesc(bin_array)
-title("IC || Single Unit || Single Trial || Spike Time Bin Response");
-xlabel("Time-bins in Milliseconds (ms)");
-xticklabels(["70", "140", "210", "280", "350", "420", "490", "560", "630", "700"])
-ylabel("Sweeps");
-hcb=colorbar;
-hcb.Title.String = "Number of spikes firing";
-colormap('jet')
-save('neuron99','bin_array');
+% imagesc(bin_array)
+% title("IC || Single Unit || Single Trial || Spike Time Bin Response");
+% xlabel("Time-bins in Milliseconds (ms)");
+% xticklabels(["70", "140", "210", "280", "350", "420", "490", "560", "630", "700"])
+% ylabel("Sweeps");
+% hcb=colorbar;
+% hcb.Title.String = "Number of spikes firing";
+% colormap('jet')
+% save('neuron99','bin_array');
 
 
-%%
-% x = {0.01, 0.01, 0.2, 0.26, 0.34, 0.41, 0.43, 0.53, 0.61, 0.61};
-% y = {0.25, 0.56, 0.69};
-% 
-% bins = 10;
-% set_bin = 0.07;
-% bin_array = zeros(1,bins);
-% 
-% 
-% for i = 1:length(x)
-%     p = x(i);
-%     if p <= set_bin
-%         bin_array(1,1) = bin_array(1,1) + 1;
-%     end
-%     for i = 1:bins
-%         if p > set_bin * i && p <= set_bin * i + set_bin && i ~= 10
-%             bin_array(1,i+1) = bin_array(1,i+1) + 1;
-%         end
-%     end
-% end
-%     
+
 
 
             
