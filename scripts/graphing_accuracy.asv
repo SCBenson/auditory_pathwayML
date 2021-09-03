@@ -48,7 +48,8 @@ for i = 1:length(neuronList)
     testing_size = 0.2 * size_of_bin_array;
 
     % The list of VCVs to create the Y input matrix
-    p = ["ABA", "ADA", "AFA", "AGA", "AKA", "ALA", "AMA", "ANA", "APA", "ASA", "ASHA", "ATA", "ATHA", "AVA", "AYA", "AZA"];
+    p = ["ABA", "ADA", "AFA", "AGA", "AKA", "ALA", "AMA", ...
+        "ANA", "APA", "ASA", "ASHA", "ATA", "ATHA", "AVA", "AYA", "AZA"];
 
 
     % make sure we enter the height of the sweeps into the function
@@ -99,7 +100,7 @@ for i = 1:length(neuronList)
     Y_hat = predict(B, testing_input);
     acc = Y_hat == testing_output; % phonemes if this doesnt work
     total_acc = sum(acc(:,1));
-    accuracy = total_acc/480;
+    accuracy = total_acc/n;
     %error = oobError(B);
     %% Save the accuracy point for graphing
 %     where_to_save = strcat('binnedMatrices\',region,'\',unit,'\',mode,'\','randtrees_results','\');
@@ -107,11 +108,20 @@ for i = 1:length(neuronList)
 %     save(saveResultsAs,'accuracy');
     
     yGraph = cat(1,yGraph,accuracy);
-    %% Number of neurons with 18% or more accuracy rating
-    threshold_of_success = (yGraph > .18);
-    num_highest_accuracy = sum(threshold_of_success(:)==1);
+    %% Save the default tbgmdl's parameters for fut
+
+    %saving each model to a structure to take data from later
+    model(i).default_tbgmdl = B;
+    model(i).training_input = training_input;
+    model(i).training_output = training_output;
+    model(i).testing_input = testing_input;
+    model(i).testing_output = testing_output;
 
 end
+%% Get the default tbgmdl's number of neurons above the threshold for accuracy rating
+accuracy_threshold = 0.18;
+threshold_of_success = (yGraph > accuracy_threshold);
+num_highest_accuracy = sum(threshold_of_success(:)==1);
 %% Error
 % figure
 % bar(B.OOBPermutedPredictorDeltaError);
@@ -120,12 +130,35 @@ end
 thresholded_importance = find(B.OOBPermutedPredictorDeltaError>0.75);
 % xlabel('Feature Index')
 % ylabel('Out-of-Bag Feature Importance')
+%% now test again, but bootstrapped...
+% this is our desired threshold for the bins 'importance'
+feature_threshold = 0.75;
+for i = length(neuronList)
+    feature_importance = find(model(i).default_tbgmdl.OOBPermutedPredictorDeltaError>feature_threshold);
+    tr_i = model(i).training_input;
+    tr_o = model(i).training_output;
+    te_i = model(i).testing_input;
+    te_o = model(i).testing_output;
+    % get the bootstrapped model
+    B_bootstrapped = TreeBagger(400,tr_i(:,feature_importance),tr_o, ...
+        'OOBPrediction','on','OOBPredictorImportance','off');
+    % get the y_hat from bootstrapped model
+    Y_hat_bootstrapped = predict(B_bootstrapped, te_i(:,feature_importance)); 
+    % get the indexes where there was an accurate prediction
+    accDist_bootstrapped = Y_hat_bootstrapped == te_o;
+    % Get the sum of correct answers found
+    total_correct_bootstrapped = sum(accDist_bootstrapped(:,1));
+    % get the ratio of correct/total
+    accuracy_bootstrapped = total_correct_bootstrapped/n;
+    % 
+    
+    % save bootstrapped answers...
+    model(i).bootstrapped_tbgmdl = B_bootstrapped;
+    
+end
 %%
-
-
-
-
-B_important = TreeBagger(400,training_input(:,thresholded_importance),training_output,'OOBPrediction','on','OOBPredictorImportance','off'); 
+B_important = TreeBagger(400,training_input(:,thresholded_importance), ... 
+    training_output,'OOBPrediction','on','OOBPredictorImportance','off'); 
 
 Y_hat_bootstrap = predict(B_important, testing_input(:,thresholded_importance));
 accuracyDistribution_bootstrap = Y_hat == testing_output;
@@ -155,8 +188,8 @@ answer.region = region;
 answer.unit = unit;
 answer.mode = mode;
 % Models for default tbg & bootstrapped
-answer.tbgmdl = B;
-answer.tbgmdl_bootstrap_tbmdl = B_important;
+answer.default_tbgmodels = model;
+answer.tbgmdl_bootstrap_tbmdl = B_important; % to be added
 % Accuracy of default tbg & bootstrapped
 answer.tbgmdl_accuracy = yGraph;
 answer.tbgmdl_accuracy_bootstrap = accuracy_bootstrap;
