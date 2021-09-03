@@ -1,6 +1,5 @@
-%load('neuron1','bin_array')
 %Random Forest Classification
-
+%% Selecting REGION / UNIT / MODE && Getting Directories
 
 region = 'IC';
 unit = 'SU';
@@ -22,6 +21,8 @@ mkdir(parent_folder,folder_name);
 %% Setting graphing parameters..
 xGraph = linspace(1,length(neuronList)-1,length(neuronList)-1);
 yGraph = [];
+model = struct();
+%% TreeBagging
 for i = 1:length(neuronList)
     disp(i)
     % get a bin_array and it's neuronID name [the file is scrambled]
@@ -102,12 +103,7 @@ for i = 1:length(neuronList)
     total_acc = sum(acc(:,1));
     accuracy = total_acc/n;
     %error = oobError(B);
-    %% Save the accuracy point for graphing
-%     where_to_save = strcat('binnedMatrices\',region,'\',unit,'\',mode,'\','randtrees_results','\');
-%     saveResultsAs = strcat(where_to_save,neuronID,'_randForestAccuracy');
-%     save(saveResultsAs,'accuracy');
-    
-    % save the accuracies in an array called yGraph
+    %% Save the accuracy points for graphing later
     yGraph = cat(1,yGraph,accuracy);
     %% Save the default tbgmdl's parameters for future bootstrapping
     model(i).default_tbgmdl = B;
@@ -121,18 +117,11 @@ end
 accuracy_threshold = 0.18;
 threshold_of_success = (yGraph > accuracy_threshold);
 num_highest_accuracy = sum(threshold_of_success(:)==1);
-%% Error
-% figure
-% bar(B.OOBPermutedPredictorDeltaError);
-%% Margin
-
-thresholded_importance = find(B.OOBPermutedPredictorDeltaError>0.75);
-% xlabel('Feature Index')
-% ylabel('Out-of-Bag Feature Importance')
-%% now test again, but bootstrapped...
+%% BOOTSTRAPPING
 % this is our desired threshold for the bins 'importance'
 feature_threshold = 0.75;
-model_bootstrapped = struct('bootstrapped_tbgmdl', cell(1, length(neuronList)-1));
+model_bootstrapped = struct();
+% now lets get our bootrapped model running on each neuron...
 for i = length(neuronList)
     feature_importance = find(model(i).default_tbgmdl.OOBPermutedPredictorDeltaError>feature_threshold);
     tr_i = model(i).training_input;
@@ -150,38 +139,19 @@ for i = length(neuronList)
     total_correct_bootstrapped = sum(accDist_bootstrapped(:,1));
     % get the ratio of correct/total
     accuracy_bootstrapped = total_correct_bootstrapped/n;
-    % 
+    % get the error distribution
+    error_bootstrapped = oobError(B_bootstrapped);
+    % get the margin distribution
+    margin_bootstrapped = oobMeanMargin(B_bootstrapped);
     
     % save bootstrapped answers...
-    model_bootstrapped(i).bootstrapped_tbgmdl = B_bootstrapped;
-    
+    model_bootstrapped(i).tbgmdl = B_bootstrapped;
+    model_bootstrapped(i).Y_hat = Y_hat_bootstrapped;
+    model_bootstrapped(i).totalCorrect = total_correct_bootstrapped;
+    model_bootstrapped(i).accuracyRatio = accuracy_bootstrapped;
+    model_bootstrapped(i).error = error_bootstrapped;
+    model_bootstrapped(i).margin = margin_bootstrapped;
 end
-%%
-B_important = TreeBagger(400,training_input(:,thresholded_importance), ... 
-    training_output,'OOBPrediction','on','OOBPredictorImportance','off'); 
-
-Y_hat_bootstrap = predict(B_important, testing_input(:,thresholded_importance));
-accuracyDistribution_bootstrap = Y_hat == testing_output;
-total_correct_bootstrap = sum(accuracyDistribution_bootstrap(:,1));
-accuracy_bootstrap = total_correct_bootstrap/480;
-threshold_of_success = (accuracyDistribution_bootstrap > .18);
-num_highest_accuracy_bootstrap = sum(threshold_of_success(:)==1);
-
-% plot(oobMeanMargin(B_important));
-% xlabel('Number of Grown Trees')
-% ylabel('Out-of-Bag Mean Classification Margin')
-% figure
-tbgmdl_error = oobError(B);
-bootstrap_tbgmdl_error = oobError(B_important);
-% plot(oobError(B_important),'r-')
-% hold on
-% plot(oobError(B),'b-')
-% xlabel('Number of Grown Trees')
-% ylabel('Out-of-Bag Classification Error')
-
-% plot(xGraph,yGraph*100)
-% xticklabels(xGraph)
-
 %% Saving the answers in a structure called answer
 % The region, unit and mode of this file
 answer.region = region;
@@ -194,18 +164,27 @@ answer.tbgmdl_bootstrap_tbmdl = B_important; % to be added
 answer.tbgmdl_accuracy = yGraph;
 answer.tbgmdl_accuracy_bootstrap = accuracy_bootstrap;
 % Number of neurons showing accuracies above the threshold for default tbg & bootstrapped (=0.18)
-answer.tbgmdl_numhighestacc = accs;
+answer.tbgmdl_numhighestacc = num_highest_accuracy;
 answer.tbgmdl_numhighestacc_bootstrap = num_highest_accuracy_bootstrap;
 % Error distribution for default tbg & bootstrapped
 answer.tbgmdl_error = tbgmdl_error;
 answer.tbgmdl_error_bootstrap = bootstrap_tbgmdl_error;
-
-
 %% Saving the answer structure
 folder = strcat(parent_folder,'\',folder_name,'\','answer');
 save(folder,'-struct','answer');
-%% Save all the results
+%% plotting and saving all the results
+% plot(oobMeanMargin(B_important));
+% xlabel('Number of Grown Trees')
+% ylabel('Out-of-Bag Mean Classification Margin')
+% figure
+% plot(oobError(B_important),'r-')
+% hold on
+% plot(oobError(B),'b-')
+% xlabel('Number of Grown Trees')
+% ylabel('Out-of-Bag Classification Error')
 
+% plot(xGraph,yGraph*100)
+% xticklabels(xGraph)
 
 
 
