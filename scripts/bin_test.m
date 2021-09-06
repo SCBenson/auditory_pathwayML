@@ -1,6 +1,6 @@
 region = 'AI';
 unit = 'MU';
-type = '1ch500';
+type = '8ch500';
 folderdir = fullfile('Data',region,unit,type);
 f = dir(folderdir);
 f = f(3:end);
@@ -15,8 +15,8 @@ for neuron = 1:length(f)
     sweep_height = length(checkInstance);
     height = sweep_height*length(trialInstance);
     %% setting the parameters for the bins
-    set_bin = 0.01;
-    bins = 70;
+    set_bin = 0.001;
+    bins = 700;
     bin_array = zeros(height,bins);
     repIndex = sweep_height;
 
@@ -77,8 +77,8 @@ for neuron = 1:length(f)
         end
     end
 neuronID = int2str(neuron);
-where_to_save = strcat('binnedMatrices\',region,'\',unit,'\',type,'\');
-saveResultsAs = strcat(where_to_save,'neuron',neuronID);
+where_to_save = strcat('binnedMatrices\',region,'\',unit,'\',type,'\','otherbins\','\1ms\');
+saveResultsAs = strcat(where_to_save,'neuron',neuronID,'_1ms');
 save(saveResultsAs,'bin_array');
 
 end

@@ -9,8 +9,8 @@ duration=0.7;
 load('Default.mat','parameters');
 
 %% Region & Node Specific Parameters
-region = 'AN'; % AN: Auditory Nerve (simulated) || IC: Inferior Colliculus (Real-data) || AI: Primary Auditory Cortex (Real-data)
-mode = '1ch16'; % [natural(AN),RF(IC,AI)] OR xchyyy , where x=[0(IC,AI),1,2,4,8] yyy=[16,50(IC&AI),160(IC&AI),500]
+region = 'IC'; % AN: Auditory Nerve (simulated) || IC: Inferior Colliculus (Real-data) || AI: Primary Auditory Cortex (Real-data)
+mode = '0ch'; % [natural(AN),RF(IC,AI)] OR xchyyy , where x=[0(IC,AI),1,2,4,8] yyy=[16,50(IC&AI),160(IC&AI),500]
 unitType = 'SU'; % SU-Single Unit || MU-Multi Unit
 %% Extracting Region/Node Specific Data
 if region == 'AN'
